@@ -15,6 +15,7 @@
         android:fontFamily="@font/kakaobigsans_bold"
         android:gravity="start"
         android:hint="오늘은 어떤 제목이 좋을까요"
+        android:inputType="text"
         android:maxLength="30"
         android:paddingStart="15dp"
         android:paddingTop="10dp"
@@ -49,11 +50,13 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fontFamily="@font/kakaobigsans_bold"
+        android:inputType="textMultiLine"
         android:gravity="start"
         android:maxLength="5000"
         android:paddingTop="10dp"
         android:paddingBottom="10dp"
         android:textSize="18sp"
+        app:counterEnabled="false"
         android:textColor="@color/black" />
     </com.google.android.material.textfield.TextInputLayout>
     <LinearLayout
