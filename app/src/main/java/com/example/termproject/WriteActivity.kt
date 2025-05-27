@@ -9,5 +9,8 @@ class WriteActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         val binding = ActivityWriteBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        binding.draftButton.setOnClickListener {
+
+        }
     }
 }
