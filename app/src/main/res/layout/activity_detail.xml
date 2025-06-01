@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 일기 상세 보기 화면 -->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <TextView
+            android:id="@+id/tv_detail_date"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="2025-06-01"
+            android:textStyle="bold" />
+
+        <ImageView
+            android:id="@+id/img_detail_photo"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:scaleType="centerCrop"
+            android:layout_marginTop="8dp"
+            android:src="@drawable/ic_launcher_background" />
+
+        <TextView
+            android:id="@+id/tv_detail_location"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="\'부산광역시 금정구 부산대학교\'"
+            android:layout_marginTop="8dp" />
+
+        <TextView
+            android:id="@+id/tv_detail_emotion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="감정: 긍정"
+            android:layout_marginTop="8dp" />
+
+        <TextView
+            android:id="@+id/tv_detail_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="일기 상세 내용..."
+            android:layout_marginTop="8dp" />
+    </LinearLayout>
+</ScrollView>
