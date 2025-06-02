@@ -60,6 +60,15 @@
         app:counterEnabled="false"
         android:textColor="@color/black" />
     </com.google.android.material.textfield.TextInputLayout>
+    <EditText
+        android:id="@+id/editLocation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="장소를 입력하세요 (예: 서울시 강남구)"
+        android:padding="12dp"
+        android:textSize="16sp"
+        android:layout_marginTop="12dp"
+        tools:ignore="MissingConstraints" />
     <LinearLayout
         android:id="@+id/buttonPanel"
         android:layout_width="0dp"

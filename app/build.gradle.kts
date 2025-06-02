@@ -4,6 +4,8 @@ plugins {
     id("com.google.gms.google-services")
 }
 
+val apikey: String = project.findProperty("MAPS_API_KEY") as? String ?: ""
+
 android {
     namespace = "com.example.termproject"
     compileSdk = 35
@@ -16,6 +18,9 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // local.properties의 API 키를 Manifest에 주입
+        manifestPlaceholders["MAPS_API_KEY"]=apikey
     }
 
     buildFeatures{
@@ -50,4 +55,7 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+    implementation(libs.firebase.database.ktx)
+    implementation(libs.play.services.location)
+    implementation("com.google.android.gms:play-services-maps:18.2.0")
 }
