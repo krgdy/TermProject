@@ -1,11 +1,10 @@
 package com.example.termproject
 
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import com.example.termproject.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -13,8 +12,13 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         val binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        val spf : SharedPreferences = getSharedPreferences("appPrefs", Context.MODE_PRIVATE)
+        val DraftExist = spf.getBoolean("draftExist",false)
+
         binding.writeButton.setOnClickListener {
             val intent = Intent(this, WriteActivity::class.java)
+            intent.putExtra("loadDraft",DraftExist)
             startActivity(intent)
         }
         binding.listButton.setOnClickListener {
