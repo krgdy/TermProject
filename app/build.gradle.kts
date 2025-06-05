@@ -59,4 +59,5 @@ dependencies {
     implementation(libs.firebase.database.ktx)
     implementation(libs.play.services.location)
     implementation("com.google.android.gms:play-services-maps:18.2.0")
+    implementation("com.google.firebase:firebase-firestore-ktx:25.1.4")
 }
