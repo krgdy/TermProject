@@ -14,11 +14,11 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         val spf : SharedPreferences = getSharedPreferences("appPrefs", Context.MODE_PRIVATE)
-        val DraftExist = spf.getBoolean("draftExist",false)
+        val draftExist = spf.getBoolean("draftExist",false)
 
         binding.writeButton.setOnClickListener {
             val intent = Intent(this, WriteActivity::class.java)
-            intent.putExtra("loadDraft",DraftExist)
+            intent.putExtra("loadDraft",draftExist)
             startActivity(intent)
         }
         binding.listButton.setOnClickListener {
