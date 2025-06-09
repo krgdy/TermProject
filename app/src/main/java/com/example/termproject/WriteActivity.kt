@@ -10,9 +10,14 @@ import com.example.termproject.databinding.ActivityWriteBinding
 import java.text.SimpleDateFormat
 import android.Manifest
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
 import android.location.Location
+import android.net.Uri
+import android.os.Build
+import android.provider.MediaStore
 import android.util.Log
+import androidx.core.content.FileProvider
 import androidx.lifecycle.lifecycleScope
 import com.example.termproject.retrofit.NetworkService
 import kotlinx.coroutines.launch
@@ -28,11 +33,13 @@ import com.example.termproject.retrofit.retrofitObject
 import com.example.termproject.model.papagoRequest
 import com.example.termproject.model.papagoResponse
 import com.example.termproject.model.papagoErrorResponse
+import com.google.firebase.storage.FirebaseStorage
 import okhttp3.ResponseBody
 import retrofit2.Callback
 import retrofit2.Call
 import retrofit2.Converter
 import retrofit2.Response
+import java.io.File
 
 class WriteActivity : AppCompatActivity() {
     private lateinit var binding: ActivityWriteBinding
@@ -41,6 +48,11 @@ class WriteActivity : AppCompatActivity() {
     private lateinit var database: FirebaseFirestore
     private lateinit var classifierHelper: TextClassificationHelper
     private var onSaving : Int = 1 //중복 save를 막기 위한 semaphore같은 역할
+    private var photoUri: Uri? = null
+    private var photoFile: File? = null
+    private val storage = FirebaseStorage.getInstance()
+    private var selectedAddress: String? = null
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,10 +69,13 @@ class WriteActivity : AppCompatActivity() {
                     val title : String? = draft.get("title") as? String
                     val content : String? = draft.get("content") as? String
                     val location : String? = draft.get("location") as? String
-                    withContext(Dispatchers.Main){
-                        if(title != null && title.isNotBlank()) binding.diaryTitle.setText(title)
-                        if(content != null && content.isNotBlank()) binding.diaryContent.setText(content)
-                        if(location != null && location.isNotBlank()) binding.editLocation.setText(location)
+                    withContext(Dispatchers.Main) {
+                        if (title?.isNotBlank() == true) binding.diaryTitle.setText(title)
+                        if (content?.isNotBlank() == true) binding.diaryContent.setText(content)
+                        if (location?.isNotBlank() == true) {
+                            selectedAddress = location
+                            Toast.makeText(this@WriteActivity, "불러온 위치: $location", Toast.LENGTH_SHORT).show()
+                        }
                     }
                 }
                 catch(e : Exception) {
@@ -124,7 +139,48 @@ class WriteActivity : AppCompatActivity() {
                     onSaving = 1 //저장 실패 onSaving 초기화
                 }
             })
+        binding.btnCamera.setOnClickListener {
+            takePicture()
+        }
+
+        binding.btnGallery.setOnClickListener {
+            pickImageFromGallery()
+        }
     }
+
+    // 사진 촬영 함수 - 카메라 앱
+    private fun takePicture() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+            != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA), 3000)
+        }
+
+        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        photoFile = File.createTempFile("IMG_", ".jpg", cacheDir)
+        photoUri = FileProvider.getUriForFile(this, "${packageName}.provider", photoFile!!)
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri)
+        startActivityForResult(intent, 2001)
+    }
+
+    // 사진 선택 함수 - 갤러리 앱
+    private fun pickImageFromGallery() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES)
+                != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_MEDIA_IMAGES), 3001)
+            }
+        } else {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), 3002)
+            }
+        }
+
+        val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+        startActivityForResult(intent, 2002)
+    }
+
+
     // 현재 위치 받아오기
     private fun getCurrentLocation() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
@@ -141,17 +197,17 @@ class WriteActivity : AppCompatActivity() {
     private fun saveDiary(emotion:String){
         val title = binding.diaryTitle.text.toString().trim()
         val content = binding.diaryContent.text.toString().trim()
-        val locationText = binding.editLocation.text.toString().trim() // 입력된 위치 가져오기
+        val locationText = selectedAddress?.trim() ?: ""
 
         if (title.isEmpty() || content.isEmpty() || locationText.isEmpty()) {
-            Toast.makeText(this, "제목, 내용, 장소를 모두 입력해주세요.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "제목, 내용, 위치를 모두 입력해주세요.", Toast.LENGTH_SHORT).show()
             return
         }
 
         val diaryId = UUID.randomUUID().toString()
         val date = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(Date())
 
-        val diaryData = mapOf(
+        val diaryData = mutableMapOf(
             "id" to diaryId,
             "title" to title,
             "content" to content,
@@ -160,24 +216,76 @@ class WriteActivity : AppCompatActivity() {
             "emotion" to emotion    //getEmotion에서 추론해서 갖고 온 감정
         )
 
-        val diaryRef = database.collection("diaries").document(diaryId)
-        diaryRef.set(diaryData).addOnSuccessListener {
-            Toast.makeText(this, "일기 저장 완료!", Toast.LENGTH_SHORT).show()
-            val spf : SharedPreferences = getSharedPreferences("appPrefs", Context.MODE_PRIVATE)
-            val editor = spf.edit()
-            editor.putBoolean("draftExist",false)   //일기가 저장 되었으므로 이제 임시 저장이 필요없음
-            editor.apply()
-            finish()
-        }.addOnFailureListener {
-            Toast.makeText(this, "저장 실패: ${it.message}", Toast.LENGTH_SHORT).show()
+        // 사진이 있을 경우 Storage 업로드 후 URL 저장
+        if (photoUri != null) {
+            lifecycleScope.launch(Dispatchers.IO) {
+                try {
+                    val photoRef = storage.reference.child("images/$diaryId.jpg")
+                    photoRef.putFile(photoUri!!).await()
+                    val downloadUrl = photoRef.downloadUrl.await()
+                    diaryData["imageUrl"] = downloadUrl.toString()
+
+                    // Firestore 저장도 함께 이 coroutine 안에서 실행
+                    database.collection("diaries").document(diaryId)
+                        .set(diaryData)
+                        .addOnSuccessListener {
+                            runOnUiThread {
+                                Toast.makeText(this@WriteActivity, "일기 저장 완료!", Toast.LENGTH_SHORT).show()
+                                getSharedPreferences("appPrefs", Context.MODE_PRIVATE)
+                                    .edit().putBoolean("draftExist", false).apply()
+                                finish()
+                            }
+                        }
+                        .addOnFailureListener {
+                            runOnUiThread {
+                                Toast.makeText(this@WriteActivity, "저장 실패: ${it.message}", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+
+                } catch (e: Exception) {
+                    Log.e("WriteActivity", "사진 업로드 실패: ${e.message}")
+                }
+            }
+        } else {
+            // 사진이 없을 경우 Firestore만 저장
+            database.collection("diaries").document(diaryId)
+                .set(diaryData)
+                .addOnSuccessListener {
+                    Toast.makeText(this@WriteActivity, "일기 저장 완료!", Toast.LENGTH_SHORT).show()
+                    getSharedPreferences("appPrefs", Context.MODE_PRIVATE)
+                        .edit().putBoolean("draftExist", false).apply()
+                    finish()
+                }
+                .addOnFailureListener {
+                    Toast.makeText(this@WriteActivity, "저장 실패: ${it.message}", Toast.LENGTH_SHORT).show()
+                }
         }
     }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == 1001 && resultCode == RESULT_OK && data != null) {
+            selectedAddress = data.getStringExtra("selectedAddress")
+            Toast.makeText(this, "선택된 위치: $selectedAddress", Toast.LENGTH_SHORT).show()
+        }
+
+        if (requestCode == 2001 && resultCode == RESULT_OK && photoUri != null) {
+            binding.imagePreview.setImageURI(photoUri)
+        }
+
+        if (requestCode == 2002 && resultCode == RESULT_OK && data != null) {
+            photoUri = data.data
+            binding.imagePreview.setImageURI(photoUri)
+        }
+    }
+
 
     //일기 임시 저장 함수
     private fun draftDiary() {
         val title = binding.diaryTitle.text.toString().trim()
         val content = binding.diaryContent.text.toString().trim()
-        val locationText = binding.editLocation.text.toString().trim() // 입력된 위치 가져오기
+        val locationText = selectedAddress?.trim() ?: "" // 입력된 위치 가져오기
 
         if (title.isEmpty() || content.isEmpty() || locationText.isEmpty()) {
             Toast.makeText(this, "제목, 내용, 장소를 모두 입력해주세요.", Toast.LENGTH_SHORT).show()
@@ -257,6 +365,23 @@ class WriteActivity : AppCompatActivity() {
                 onSaving = 1 //저장 실패 onSaving 초기화
             }
         })
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        if (grantResults.isEmpty() || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(this, "권한이 필요합니다.", Toast.LENGTH_SHORT).show()
+        } else {
+            when (requestCode) {
+                3000 -> takePicture()
+                3001, 3002 -> pickImageFromGallery()
+            }
+        }
     }
 
 }
