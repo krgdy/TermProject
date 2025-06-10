@@ -1,5 +1,4 @@
 import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
-import java.io.FileInputStream
 
 plugins {
     alias(libs.plugins.android.application)
@@ -7,7 +6,7 @@ plugins {
     id("com.google.gms.google-services")
 }
 
-val apikey: String = project.findProperty("MAPS_API_KEY") as? String ?: ""
+    val apikey: String = "\"${getProperty("MAPS_API_KEY")}\""
 
 android {
     namespace = "com.example.termproject"
