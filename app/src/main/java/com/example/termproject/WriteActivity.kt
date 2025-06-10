@@ -10,6 +10,7 @@ import com.example.termproject.databinding.ActivityWriteBinding
 import java.text.SimpleDateFormat
 import android.Manifest
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
 import android.location.Location
 import android.util.Log
@@ -167,7 +168,17 @@ class WriteActivity : AppCompatActivity() {
             val editor = spf.edit()
             editor.putBoolean("draftExist",false)   //일기가 저장 되었으므로 이제 임시 저장이 필요없음
             editor.apply()
-            finish()
+            val intent = Intent(this, DetailActivity::class.java).apply {
+                putExtra("title", diaryData["title"])
+                putExtra("content", diaryData["content"])
+                putExtra("date", diaryData["date"])
+                putExtra("location", diaryData["location"])
+                putExtra("emotion", diaryData["emotion"])
+            }
+            binding.diaryTitle.setText("")
+            binding.diaryContent.setText("")
+            binding.editLocation.setText("")
+            startActivity(intent)
         }.addOnFailureListener {
             Toast.makeText(this, "저장 실패: ${it.message}", Toast.LENGTH_SHORT).show()
         }
