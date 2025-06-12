@@ -7,9 +7,11 @@ import android.location.Location
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.termproject.databinding.ActivityMapBinding
+import com.example.termproject.model.DiaryLatLang
 
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -19,6 +21,7 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.tasks.Task
+import com.google.firebase.firestore.FirebaseFirestore
 
 class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
@@ -26,6 +29,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     private var lastKnownLocation: Location? = null
     private var locationPermissionGranted = false
+    private lateinit var database: FirebaseFirestore
+    private val diaryList = mutableListOf<DiaryLatLang>()  // loadDiaryList
 
     companion object {
         private const val TAG = "test : Mapactivity"
@@ -42,6 +47,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         binding = ActivityMapBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        database = FirebaseFirestore.getInstance()
+        loadDiaryList()
 
         // SupportMapFragment를 가져와 지도가 준비되면 알림을 받습니다.
         val mapFragment = supportFragmentManager
@@ -52,6 +59,21 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
     }
 
+    private fun loadDiaryList() {
+        database.collection("diaries")
+            .get()
+            .addOnSuccessListener { result ->
+                diaryList.clear()  // 기존 리스트 초기화
+                for (document in result) {
+                    val diary = document.toObject(Diary::class.java)
+                    diaryList.add(diary)
+                }
+                adapter.notifyDataSetChanged()  // UI에 데이터 갱신
+            }
+            .addOnFailureListener {
+                Toast.makeText(this, "일기 불러오기 실패: ${it.message}", Toast.LENGTH_SHORT).show()
+            }
+    }
     /**
      * 지도를 사용할 준비가 되면 호출되는 콜백입니다.
      * 이 콜백이 트리거될 때까지 지도의 핸들을 가져올 수 없습니다.
@@ -69,6 +91,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         // 위치 UI 및 현재 위치 가져오기
         updateLocationUI()
         getDeviceLocation()
+
     }
 
     /**

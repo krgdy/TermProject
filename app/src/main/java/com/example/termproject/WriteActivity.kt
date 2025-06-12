@@ -158,7 +158,9 @@ class WriteActivity : AppCompatActivity() {
             "content" to content,
             "date" to date,
             "location" to locationText, // 사용자가 입력한 주소
-            "emotion" to emotion    //getEmotion에서 추론해서 갖고 온 감정
+            "emotion" to emotion,    //getEmotion에서 추론해서 갖고 온 감정
+            "latitude" to currentLocation?.latitude.toString(),   //위도
+            "longitude" to currentLocation?.longitude.toString() //경도
         )
 
         val diaryRef = database.collection("diaries").document(diaryId)
