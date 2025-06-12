@@ -20,6 +20,9 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import com.google.android.gms.maps.model.Marker
+import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -31,7 +34,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     private var locationPermissionGranted = false
     private lateinit var database: FirebaseFirestore
     private val diaryList = mutableListOf<DiaryLatLang>()  // loadDiaryList
-
+    private val markerToDiary = mutableMapOf<Marker,DiaryLatLang>()
     companion object {
         private const val TAG = "test : Mapactivity"
         private const val PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1
@@ -48,7 +51,6 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         setContentView(binding.root)
 
         database = FirebaseFirestore.getInstance()
-        loadDiaryList()
 
         // SupportMapFragment를 가져와 지도가 준비되면 알림을 받습니다.
         val mapFragment = supportFragmentManager
@@ -59,21 +61,6 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
     }
 
-    private fun loadDiaryList() {
-        database.collection("diaries")
-            .get()
-            .addOnSuccessListener { result ->
-                diaryList.clear()  // 기존 리스트 초기화
-                for (document in result) {
-                    val diary = document.toObject(Diary::class.java)
-                    diaryList.add(diary)
-                }
-                adapter.notifyDataSetChanged()  // UI에 데이터 갱신
-            }
-            .addOnFailureListener {
-                Toast.makeText(this, "일기 불러오기 실패: ${it.message}", Toast.LENGTH_SHORT).show()
-            }
-    }
     /**
      * 지도를 사용할 준비가 되면 호출되는 콜백입니다.
      * 이 콜백이 트리거될 때까지 지도의 핸들을 가져올 수 없습니다.
@@ -81,7 +68,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
      */
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
-
+        loadMarkers()
         // 위치 권한 확인 및 요청
         if (ContextCompat.checkSelfPermission(this.applicationContext,
                 Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -91,9 +78,45 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         // 위치 UI 및 현재 위치 가져오기
         updateLocationUI()
         getDeviceLocation()
-
     }
-
+    //db에서 다이어리 읽고 addMarker call로 마커 만들기
+    private fun loadMarkers() {
+        database.collection("diaries")
+            .get()
+            .addOnSuccessListener { result ->
+                diaryList.clear()  // 기존 리스트 초기화
+                for (document in result) {
+                    val diary = document.toObject(DiaryLatLang::class.java)
+                    diaryList.add(diary)
+                    addmarker(diary)
+                }
+            }
+            .addOnFailureListener {
+                Toast.makeText(this, "일기 불러오기 실패: ${it.message}", Toast.LENGTH_SHORT).show()
+            }
+    }
+    //받은 diary를 이용해 마커 생성
+    private fun addmarker(diary : DiaryLatLang){
+        val diary_lat = diary.latitude.toDoubleOrNull()
+        val diary_lng = diary.longitude.toDoubleOrNull()
+        if(diary_lat==null||diary_lng==null)  return   //즉 위치 값이 제대로 저장 안 되었을 때
+        val markerOptions = MarkerOptions()
+        val latLng = LatLng(diary_lat,diary_lng)
+        markerOptions.position(latLng)
+        markerOptions.title(diary.title)
+        val markerColor: Float =
+        when {                                          //감정에 따른 색
+            diary.emotion == "긍정" -> BitmapDescriptorFactory.HUE_GREEN
+            diary.emotion == "다소 긍정" -> 90.0f
+            diary.emotion == "중립"-> BitmapDescriptorFactory.HUE_YELLOW
+            diary.emotion == "다소 부정" -> BitmapDescriptorFactory.HUE_ORANGE
+            else -> BitmapDescriptorFactory.HUE_RED
+        }
+        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(markerColor))
+        markerOptions.snippet(diary.emotion)
+        val marker: Marker? = mMap.addMarker(markerOptions)
+        if(marker!=null) markerToDiary.put(marker,diary)    //맵에 넣음
+    }
     /**
      * 기기 위치를 가져오기 위한 권한을 요청합니다.
      */

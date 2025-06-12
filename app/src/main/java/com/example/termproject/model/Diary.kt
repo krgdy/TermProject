@@ -16,5 +16,7 @@ data class DiaryLatLang (
     val content: String = "",
     val date: String = "",
     val location: String = "",
-    val emotion: String = ""
+    val emotion: String = "",
+    val latitude: String = "null",      //toString을 하고 받으므로 잘못되면 "null"
+    val longitude: String = "null"
 )

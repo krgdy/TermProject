@@ -1,4 +1,5 @@
 import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
+import com.android.tools.build.jetifier.core.utils.Log
 
 plugins {
     alias(libs.plugins.android.application)
@@ -6,8 +7,9 @@ plugins {
     id("com.google.gms.google-services")
 }
 
-    val apikey: String = "\"${getProperty("MAPS_API_KEY")}\""
-
+    val apikey: String = "${getProperty("MAPS_API_KEY")}"
+    print("api key: ")
+    println(apikey)
 android {
     namespace = "com.example.termproject"
     compileSdk = 35
