@@ -77,4 +77,6 @@ dependencies {
     implementation("org.tensorflow:tensorflow-lite-task-text:0.3.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.google.firebase:firebase-storage:20.3.0")
+    implementation("androidx.activity:activity-ktx:1.10.1")
 }
