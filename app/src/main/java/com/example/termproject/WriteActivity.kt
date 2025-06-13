@@ -95,7 +95,7 @@ class WriteActivity : AppCompatActivity() {
         database = FirebaseFirestore.getInstance()
         storage = FirebaseStorage.getInstance()
         setContentView(binding.root)
-
+        onSaving = 1
         // 권한 요청
         requestPermissions()
 
@@ -183,6 +183,7 @@ class WriteActivity : AppCompatActivity() {
                                 else -> "부정"
                             }
                         saveDiary(emotionString)
+                        onSaving = 1 //저장 성공이지만 뒤로 돌아오기 버튼으로 돌아왔을 때를 대비
                     }
                 }
                 //실패시 콜백 함수
@@ -198,11 +199,18 @@ class WriteActivity : AppCompatActivity() {
         val permissions = mutableListOf<String>()
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, //권한이 없으면 권한 요청
+                arrayOf(Manifest.permission.CAMERA),
+                1)
+
             permissions.add(Manifest.permission.CAMERA)
         }
-
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            permissions.add(Manifest.permission.READ_EXTERNAL_STORAGE)
+        //READ_EXTERNAL_STORAGE 권한은 이제 주어지지 않음 deprecated (and is not granted)
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, //권한이 없으면 권한 요청
+                arrayOf(Manifest.permission.READ_MEDIA_IMAGES),
+                1)
+            permissions.add(Manifest.permission.READ_MEDIA_IMAGES)
         }
 
         if (permissions.isNotEmpty()) {
@@ -217,15 +225,21 @@ class WriteActivity : AppCompatActivity() {
             cameraLauncher.launch(cameraIntent)
         } else {
             Toast.makeText(this, "카메라 권한이 필요합니다.", Toast.LENGTH_SHORT).show()
+            ActivityCompat.requestPermissions(this, //권한이 없으면 권한 요청
+                arrayOf(Manifest.permission.CAMERA),
+                1)
         }
     }
 
     // 갤러리 열기
     private fun openGallery() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED) {
             galleryLauncher.launch("image/*")
         } else {
             Toast.makeText(this, "저장소 권한이 필요합니다.", Toast.LENGTH_SHORT).show()
+            ActivityCompat.requestPermissions(this, //권한이 없으면 권한 요청
+                arrayOf(Manifest.permission.READ_MEDIA_IMAGES),
+                1)
         }
     }
 
