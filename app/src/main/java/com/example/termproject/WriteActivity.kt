@@ -47,6 +47,7 @@ class WriteActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityWriteBinding.inflate(layoutInflater)
         database = FirebaseFirestore.getInstance()
+        onSaving = 1
         setContentView(binding.root)
 
         val loadDraft = intent.getBooleanExtra("loadDraft",false)
@@ -181,6 +182,7 @@ class WriteActivity : AppCompatActivity() {
             binding.diaryContent.setText("")
             binding.editLocation.setText("")
             startActivity(intent)
+            finish()    //뒤로 돌아오는 버튼으로 돌아올 시 그냥 메인으로 보냄
         }.addOnFailureListener {
             Toast.makeText(this, "저장 실패: ${it.message}", Toast.LENGTH_SHORT).show()
         }

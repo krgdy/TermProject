@@ -2,6 +2,7 @@ package com.example.termproject
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import androidx.appcompat.app.AppCompatActivity
@@ -20,6 +21,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
@@ -69,6 +71,17 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
         loadMarkers()
+        mMap.setOnInfoWindowClickListener{ marker : Marker ->
+            if(markerToDiary[marker] == null) return@setOnInfoWindowClickListener
+            val intent = Intent(this, DetailActivity::class.java).apply {
+                putExtra("title", markerToDiary[marker]?.title)
+                putExtra("content", markerToDiary[marker]?.content)
+                putExtra("date", markerToDiary[marker]?.date)
+                putExtra("location", markerToDiary[marker]?.location)
+                putExtra("emotion", markerToDiary[marker]?.emotion)
+            }
+            startActivity(intent)
+        }
         // 위치 권한 확인 및 요청
         if (ContextCompat.checkSelfPermission(this.applicationContext,
                 Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -117,6 +130,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         val marker: Marker? = mMap.addMarker(markerOptions)
         if(marker!=null) markerToDiary.put(marker,diary)    //맵에 넣음
     }
+
     /**
      * 기기 위치를 가져오기 위한 권한을 요청합니다.
      */

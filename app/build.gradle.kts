@@ -7,7 +7,7 @@ plugins {
     id("com.google.gms.google-services")
 }
 
-    val apikey: String = "${getProperty("MAPS_API_KEY")}"
+    val apikey: String = "${getProperty("MAPS_API_KEY")}" 
     print("api key: ")
     println(apikey)
 android {
@@ -25,6 +25,8 @@ android {
 
         // local.properties의 API 키를 Manifest에 주입
         manifestPlaceholders["MAPS_API_KEY"]=apikey
+        //println("apikey = ") test용 출력문
+        //print(apikey)
         // 코드에서 직접 사용해야 하는 값이므로 buildConfig에 추가
         buildConfigField("String", "NAVER_API_KEY", "\"${getProperty("NAVER_API_KEY")}\"")
         buildConfigField("String", "NAVER_API_ID", "\"${getProperty("NAVER_API_ID")}\"")
