@@ -34,6 +34,13 @@ import retrofit2.Callback
 import retrofit2.Call
 import retrofit2.Converter
 import retrofit2.Response
+import android.graphics.Bitmap
+import android.net.Uri
+import android.provider.MediaStore
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
+import com.google.firebase.storage.FirebaseStorage
+import java.io.ByteArrayOutputStream
 
 class WriteActivity : AppCompatActivity() {
     private lateinit var binding: ActivityWriteBinding
