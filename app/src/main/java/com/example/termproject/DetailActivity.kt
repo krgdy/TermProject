@@ -2,9 +2,11 @@ package com.example.termproject
 
 // 일기 리스트에서 일기 클릭 시 상세보기 화면
 
+import android.view.View
 import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.bumptech.glide.Glide
 import com.example.termproject.databinding.ActivityDetailBinding
 
 class DetailActivity : AppCompatActivity() {
@@ -21,19 +23,28 @@ class DetailActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         // Intent로부터 데이터 받기
-        val title = intent.getStringExtra("title") ?: "(제목 없음)"
-        val content = intent.getStringExtra("content") ?: "(내용 없음)"
-        val date = intent.getStringExtra("date") ?: "(날짜 없음)"
+        val title    = intent.getStringExtra("title")    ?: "(제목 없음)"
+        val content  = intent.getStringExtra("content")  ?: "(내용 없음)"
+        val date     = intent.getStringExtra("date")     ?: "(날짜 없음)"
         val location = intent.getStringExtra("location") ?: "(장소 없음)"
-        val emotion = intent.getStringExtra("emotion") ?: "(감정 없음)"
+        val emotion  = intent.getStringExtra("emotion")  ?: "(감정 없음)"
+        val imageUrl = intent.getStringExtra("imageUrl") ?: ""
 
         // 받은 데이터를 UI에 표시
-        binding.tvDetailDate.text = "날짜: $date"
-        binding.tvDetailText.text = content
+        binding.tvDetailTitle.text    = title
+        binding.tvDetailDate.text     = "날짜: $date"
+        binding.tvDetailText.text     = content
         binding.tvDetailLocation.text = "위치: $location"
         binding.tvDetailEmotion.text = "감정: $emotion"
 
-        // 이미지 표시도 필요하면 여기서 추가 가능
-        // binding.imgDetailPhoto.setImageResource(...)
+        // imageUrl이 비어있지 않으면 Glide로 로드
+        if (imageUrl.isNotBlank()) {
+            Glide.with(this)
+                .load(imageUrl)
+                .into(binding.imgDetailPhoto)
+        } else {
+            // URL이 없으면 ImageView 숨기기
+            binding.imgDetailPhoto.visibility = View.GONE
+        }
     }
 }
