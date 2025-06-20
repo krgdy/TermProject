@@ -6,6 +6,7 @@ import android.view.View
 import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.bumptech.glide.Glide
 import com.example.termproject.databinding.ActivityDetailBinding
 
 class DetailActivity : AppCompatActivity() {

@@ -7,7 +7,8 @@ data class Diary (
     val content: String = "",
     val date: String = "",
     val location: String = "",
-    val emotion: String = ""
+    val emotion: String = "",
+    val imageUrl: String = ""
 )
 //좌표가 포함된 일기 데이터 클래스 (mapActivity)
 data class DiaryLatLang (

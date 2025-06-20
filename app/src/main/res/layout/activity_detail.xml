@@ -11,6 +11,13 @@
         android:padding="24dp">
 
         <TextView
+                android:id="@+id/tv_detail_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="2025-06-01"
+                android:textStyle="bold" />
+
+        <TextView
             android:id="@+id/tv_detail_date"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -18,7 +25,7 @@
             android:textStyle="bold" />
 
         <ImageView
-            android:id="@+id/img_detail_photo"
+            android:id="@+id/imgDetailPhoto"
             android:layout_width="match_parent"
             android:layout_height="200dp"
             android:scaleType="centerCrop"
