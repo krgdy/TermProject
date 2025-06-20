@@ -7,5 +7,6 @@ data class Diary (
     val content: String = "",
     val date: String = "",
     val location: String = "",
-    val emotion: String = ""
+    val emotion: String = "",
+    val imageUrl: String = ""
 )
