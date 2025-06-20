@@ -323,7 +323,9 @@ class WriteActivity : AppCompatActivity() {
                     "date" to date,
                     "location" to locationText, // 사용자가 입력한 주소
                     "emotion" to emotion, //getEmotion에서 추론해서 갖고 온 감정
-                    "imageUrl" to imageUrl // Firebase Storage에 업로드된 이미지 URL
+                    "imageUrl" to imageUrl, // Firebase Storage에 업로드된 이미지 URL
+                    "latitude" to currentLocation?.latitude.toString(),   //위도
+                    "longitude" to currentLocation?.longitude.toString() //경도
                 )
 
                 val diaryRef = database.collection("diaries").document(diaryId)
