@@ -37,6 +37,7 @@ class ListActivity : AppCompatActivity() {
                 putExtra("date", selectedDiary.date)
                 putExtra("location", selectedDiary.location)
                 putExtra("emotion", selectedDiary.emotion)
+                putExtra("imageUrl", selectedDiary.imageUrl)
             }
             startActivity(intent)
         }
