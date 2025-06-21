@@ -69,7 +69,7 @@
         android:layout_marginBottom="15dp"
         android:paddingTop="15dp"
         android:paddingBottom="15dp"
-        app:backgroundTint="#5F5F5F"
+        app:backgroundTint="#000000"
         android:background="@drawable/black_square_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
