@@ -4,8 +4,10 @@ package com.example.termproject
 
 import android.view.View
 import android.annotation.SuppressLint
+import android.content.res.ColorStateList
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import com.bumptech.glide.Glide
 import com.example.termproject.databinding.ActivityDetailBinding
 
@@ -32,10 +34,9 @@ class DetailActivity : AppCompatActivity() {
 
         // 받은 데이터를 UI에 표시
         binding.tvDetailTitle.text    = title
-        binding.tvDetailDate.text     = "날짜: $date"
+        binding.tvDetailDate.text     = date
         binding.tvDetailText.text     = content
-        binding.tvDetailLocation.text = "위치: $location"
-        binding.tvDetailEmotion.text = "감정: $emotion"
+        binding.tvDetailLocation.text = location
 
         // imageUrl이 비어있지 않으면 Glide로 로드
         if (imageUrl.isNotBlank()) {
@@ -45,6 +46,44 @@ class DetailActivity : AppCompatActivity() {
         } else {
             // URL이 없으면 ImageView 숨기기
             binding.imgDetailPhoto.visibility = View.GONE
+        }
+
+        val chip = binding.tvDetailEmotion  // 레이아웃 id 가 tvDetailEmotion 이지만 Chip 입니다
+        chip.text = emotion
+        when (emotion) {
+            "긍정" -> chip.apply {
+                chipIconTint = ColorStateList.valueOf(
+                    ContextCompat.getColor(context, android.R.color.white)
+                )
+                chipBackgroundColor = ColorStateList.valueOf(
+                    ContextCompat.getColor(context, R.color.emotion_positive)
+                )
+                chipStrokeColor = ColorStateList.valueOf(
+                    ContextCompat.getColor(context, R.color.emotion_positive)
+                )
+            }
+
+            "부정" -> chip.apply {
+                chipIconTint = ColorStateList.valueOf(
+                    ContextCompat.getColor(context, android.R.color.white)
+                )
+                chipBackgroundColor = ColorStateList.valueOf(
+                    ContextCompat.getColor(context, R.color.emotion_negative)
+                )
+                chipStrokeColor = ColorStateList.valueOf(
+                    ContextCompat.getColor(context, R.color.emotion_negative)
+                )
+            }
+
+            else -> chip.apply {
+                chipIcon = null
+                chipBackgroundColor = ColorStateList.valueOf(
+                    ContextCompat.getColor(context, android.R.color.darker_gray)
+                )
+                chipStrokeColor = ColorStateList.valueOf(
+                    ContextCompat.getColor(context, android.R.color.darker_gray)
+                )
+            }
         }
     }
 }

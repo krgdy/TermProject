@@ -1,56 +1,124 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 일기 상세 보기 화면 -->
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <LinearLayout
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:fitsSystemWindows="true"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="24dp">
+        android:layout_height="match_parent">
 
-        <TextView
-                android:id="@+id/tv_detail_title"
+    <!-- AppBar + Collapsing Header: 높이를 300→350dp 로 늘림 -->
+    <com.google.android.material.appbar.AppBarLayout
+            android:layout_width="match_parent"
+            android:layout_height="400dp"
+            android:fitsSystemWindows="true">
+
+        <com.google.android.material.appbar.CollapsingToolbarLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:contentScrim="?attr/colorPrimary"
+                app:expandedTitleMarginStart="16dp"
+                app:expandedTitleMarginEnd="16dp"
+                app:layout_scrollFlags="scroll|exitUntilCollapsed"
+                android:fitsSystemWindows="true">
+
+            <!-- 배경 이미지 (ImageView 높이는 match_parent 그대로) -->
+            <ImageView
+                    android:id="@+id/imgDetailPhoto"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:contentDescription="Diary Photo"
+                    android:src="@drawable/ic_launcher_background"
+                    app:layout_collapseMode="parallax"
+                    app:layout_collapseParallaxMultiplier="0.7"
+                    android:fitsSystemWindows="true"/>
+
+            <!-- 툴바(핀) -->
+            <com.google.android.material.appbar.MaterialToolbar
+                    android:id="@+id/toolbar_detail"
+                    android:layout_width="match_parent"
+                    android:layout_height="?attr/actionBarSize"
+                    app:layout_collapseMode="pin"
+                    app:navigationIconTint="@android:color/white"
+                    app:popupTheme="@style/ThemeOverlay.MaterialComponents.Light"
+                    app:title="" />
+
+        </com.google.android.material.appbar.CollapsingToolbarLayout>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <!-- 본문 영역: 높이 match_parent 로 변경 -->
+    <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            android:padding="16dp">
+
+        <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="2025-06-01"
-                android:textStyle="bold" />
+                android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/tv_detail_date"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="2025-06-01"
-            android:textStyle="bold" />
+            <!-- 제목 -->
+            <TextView
+                    android:id="@+id/tvDetailTitle"
+                    style="@style/TextAppearance.MaterialComponents.Headline5"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="제목"
+                    android:layout_marginBottom="8dp" />
 
-        <ImageView
-            android:id="@+id/imgDetailPhoto"
-            android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:scaleType="centerCrop"
-            android:layout_marginTop="8dp"
-            android:src="@drawable/ic_launcher_background" />
+            <!-- 날짜 + 감정 Chip -->
+            <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="8dp">
 
-        <TextView
-            android:id="@+id/tv_detail_location"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="\'부산광역시 금정구 부산대학교\'"
-            android:layout_marginTop="8dp" />
+                <TextView
+                        android:id="@+id/tvDetailDate"
+                        style="@style/TextAppearance.MaterialComponents.Body2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="2025-06-01"
+                        android:textColor="?attr/colorOnSurfaceVariant" />
 
-        <TextView
-            android:id="@+id/tv_detail_emotion"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="감정: 긍정"
-            android:layout_marginTop="8dp" />
+                <com.google.android.material.chip.Chip
+                        android:id="@+id/tvDetailEmotion"
+                        style="@style/Widget.MaterialComponents.Chip.Choice"
+                        android:layout_marginStart="16dp"
+                        android:layout_height="wrap_content"
+                        android:layout_width="wrap_content"
+                        android:text="긍정"
+                        android:textColor="#FFFFFF"
+                        android:textStyle="bold"
+                        app:chipIconTint="@android:color/white"
+                        app:chipBackgroundColor="@color/emotion_positive"
+                        app:chipStrokeColor="@color/emotion_positive"
+                        app:chipStrokeWidth="1dp" />
 
-        <TextView
-            android:id="@+id/tv_detail_text"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="일기 상세 내용..."
-            android:layout_marginTop="8dp" />
-    </LinearLayout>
-</ScrollView>
+            </LinearLayout>
+
+            <!-- 위치 Chip -->
+            <com.google.android.material.chip.Chip
+                    android:id="@+id/tvDetailLocation"
+                    style="@style/Widget.MaterialComponents.Chip.Action"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="'부산광역시 금정구 부산대학교'"
+                    app:chipIconTint="?attr/colorPrimary"
+                    android:layout_marginBottom="16dp" />
+
+            <!-- 내용 -->
+            <TextView
+                    android:id="@+id/tvDetailText"
+                    style="@style/TextAppearance.MaterialComponents.Body1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="일기 상세 내용..."
+                    android:lineSpacingExtra="4dp" />
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

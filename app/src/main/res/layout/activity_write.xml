@@ -83,7 +83,8 @@
                 android:text="사진 찍기"
                 android:textSize="16sp"
                 android:textColor="@color/white"
-                android:background="@drawable/black_square_button" />
+                android:backgroundTint="#5980D4"
+                 />
 
         <Button
                 android:id="@+id/btnGallery"
@@ -93,7 +94,7 @@
                 android:text="갤러리"
                 android:textSize="16sp"
                 android:textColor="@color/white"
-                android:background="@drawable/black_square_button" />
+                android:backgroundTint="#5980D4" />
     </LinearLayout>
 
     <!-- 이미지 미리보기 -->
@@ -164,7 +165,7 @@
                 android:text="삭제"
                 android:textSize="18sp"
                 android:textColor="@color/white"
-                android:background="@drawable/black_square_button" />
+                android:backgroundTint="#5980D4" />
 
         <Button
                 android:id="@+id/draftButton"
@@ -174,7 +175,7 @@
                 android:text="임시 저장"
                 android:textSize="18sp"
                 android:textColor="@color/white"
-                android:background="@drawable/black_square_button" />
+                android:backgroundTint="#5980D4" />
 
         <Button
                 android:id="@+id/saveButton"
@@ -184,7 +185,7 @@
                 android:text="완료"
                 android:textSize="18sp"
                 android:textColor="@color/white"
-                android:background="@drawable/black_square_button" />
+                android:backgroundTint="#5980D4" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
