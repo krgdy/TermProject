@@ -9,6 +9,7 @@ import com.example.termproject.adapter.DiaryAdapter
 import com.example.termproject.databinding.ActivityListBinding
 import com.example.termproject.model.Diary
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 
 class ListActivity : AppCompatActivity() {
 
@@ -52,6 +53,7 @@ class ListActivity : AppCompatActivity() {
     // Firestore에서 diaries 컬렉션의 데이터를 가져와 RecyclerView에 반영하는 함수
     private fun loadDiaryList() {
         database.collection("diaries")
+            .orderBy("date", Query.Direction.DESCENDING)
             .get()
             .addOnSuccessListener { result ->
                 diaryList.clear()  // 기존 리스트 초기화
